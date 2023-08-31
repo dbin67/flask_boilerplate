@@ -1,11 +1,41 @@
 version: '3.8'
 
 services:
-  flask:
-    build: ./src/flask
-    container_name: flask
+  haproxy:
+    image: haproxy
+    container_name: haproxy
+    volumes:
+      - ./src/haproxy/conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     ports:
-      - 5005:5000
+      - 8080:80
+    depends_on:
+      - flask1
+      - flask2
+      - flask3
+
+  flask1:
+    build: ./src/flask
+    container_name: flask1
+    env_file:
+      - .env
+    volumes:
+      - ./src/flask/project:/opt/project
+    depends_on:
+      - postgres
+
+  flask2:
+    build: ./src/flask
+    container_name: flask2
+    env_file:
+      - .env
+    volumes:
+      - ./src/flask/project:/opt/project
+    depends_on:
+      - postgres
+
+  flask3:
+    build: ./src/flask
+    container_name: flask3
     env_file:
       - .env
     volumes:
